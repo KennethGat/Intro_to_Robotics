@@ -11,7 +11,7 @@ DATE:			FEB 6 2023
 
 '''
 ======================================================================================
-							IMPORT NECESSARY MODULES
+				IMPORT NECESSARY MODULES
 ======================================================================================
 '''
 
@@ -40,7 +40,7 @@ current_pos_msg = Pose()
 
 '''
 =====================================================================================
-						DEFINE NECESSARY FUNCTIONS TO GET REQUIRED VARIABLES
+		DEFINE NECESSARY FUNCTIONS TO GET REQUIRED VARIABLES
 =====================================================================================
 '''
 # Function to get the current x-axis postion of Turtle Bot
@@ -58,7 +58,7 @@ def pose_callback(current_pos_msg):
 
 '''
 =====================================================================================
-									DEFINE MAIN FUNCTION
+				DEFINE MAIN FUNCTION
 =====================================================================================
 '''
 if __name__ == '__main__':
