@@ -3,15 +3,15 @@
 '''
 COURSE CODE:	CSC592 (SPRING 2023)
 COURSE NAME:	INTRODUCTION TO ROBOTICS
-NAME:			KENNETH MURIUKI GATOBU
-ASSIGNMENT:		ROBOTICS LAB 1
-DATE:			FEB 6 2023
+NAME:		KENNETH MURIUKI GATOBU
+ASSIGNMENT:	ROBOTICS LAB 1
+DATE:		FEB 6 2023
 '''
 
 
 '''
 ============================================================================
-				IMPORT NECESSARY MODULES
+			IMPORT NECESSARY MODULES
 ============================================================================
 '''
 
@@ -30,7 +30,7 @@ from robotics_lab1.msg import Turtlecontrol
 
 '''
 ============================================================================
-				DEFINE MESSAGE VARIABLES
+			DEFINE MESSAGE VARIABLES
 ============================================================================
 '''
 
@@ -43,7 +43,7 @@ desired_pos_msg = Turtlecontrol()
 
 '''
 ============================================================================
-			DEFINE NECESSARY FUNCTIONS TO GET REQUIRED VARIABLES
+		DEFINE NECESSARY FUNCTIONS TO GET REQUIRED VARIABLES
 ============================================================================
 '''
 # Function to get the current x-axis postion of Turtle Bot
@@ -72,7 +72,7 @@ def final_param(gain, final):
 
 '''
 =====================================================================================
-					DEFINE MAIN FUNCTION
+				DEFINE MAIN FUNCTION
 =====================================================================================
 '''
 if __name__ == '__main__':
