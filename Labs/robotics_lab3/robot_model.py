@@ -31,6 +31,7 @@ def dh_transformation (DH_Param):
 	trans_Zd = DH_Param[2]
 	rotTheta_Z = DH_Param[3]
 	
+	# Define the generic transformation matrix for a single link
 	A_i = np.array([
 					[math.cos(rotTheta_Z), (-math.sin(rotTheta_Z) * math.cos(rotAlpha_X)), (math.sin(rotTheta_Z) * math.sin(rotAlpha_X)), (trans_Xa * math.cos(rotTheta_Z))],
 					[math.sin(rotTheta_Z), (math.cos(rotTheta_Z) * math.cos(rotAlpha_X)), (-math.cos(rotTheta_Z) * math.sin(rotAlpha_X)), (trans_Xa * math.sin(rotTheta_Z))],
@@ -38,7 +39,7 @@ def dh_transformation (DH_Param):
 					[0.0, 0.0, 0.0, 1.0]
 					])
 					
-					
+	# Return the transformation matrix for a link_i				
 	return A_i
 	
 

@@ -37,7 +37,7 @@ def two_link_planar(planar_m_params):
 	final_pos = rm.get_pos(final)
 	
 	print (f'\nFinal end-effector position [x,y,z] for the planar-manipulator is:' 
-			f'\n[{final_pos[0]:.2f},{final_pos[1]:.2f},{final_pos[2]:.2f}] in Meters')
+			f'\n[{final_pos[0]:.2f}, {final_pos[1]:.2f}, {final_pos[2]:.2f}] in Meters')
 	
 	final_rot = rm.get_rot(final)
 	
@@ -105,7 +105,7 @@ def UR5e_6DoF_robot(ur5e_DH_params):
 	final_rot = rm.get_rot(final)
 	
 	print (f'\nFinal end-effector rotation [roll-pitch-yaw] for the 6DoF-UR5e-robot is:'
-			f'\n[{final_rot[0]:.2f}, {final_rot[1]:.2f}, {final_rot[2]:.2f}] in radians')
+			f'\n[{final_rot[0]:.2f}, {final_rot[1]:.2f}, {final_rot[2]:.2f}] in radians\n')
 	
 	
 
