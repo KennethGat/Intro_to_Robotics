@@ -63,8 +63,8 @@ if __name__ == '__main__':
 			hsv_img = cv2.cvtColor(rgb_img, cv2.COLOR_RGB2HSV)
 			
 			# Define the upper and lower hsv ranges
-			lower_yellow_hsv = np.array([20,30,15])
-			upper_yellow_hsv = np.array([60,255,255])
+			lower_yellow_hsv = np.array([19,1,1])
+			upper_yellow_hsv = np.array([62,255,255])
 			
 			# Filter the image to make the yellow ball stand out
 			hsv_img = cv2.inRange(hsv_img, lower_yellow_hsv, upper_yellow_hsv)
