@@ -80,7 +80,7 @@ if __name__ == '__main__':
 		matrix_A = []
 		for params in current_sphere_params:
 			matrix_A.append([2*params.x, 2*params.y, 2*params.z, 1])
-		matrix_A = np.array(matrix_B)
+		matrix_A = np.array(matrix_A)
 		
 		# Create B matrix
 		matrix_B = []
