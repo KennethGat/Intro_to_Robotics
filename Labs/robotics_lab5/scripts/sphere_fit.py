@@ -20,7 +20,6 @@ DATE:			MARCH 27 2023
 import rospy
 import numpy as np
 import math
-#from geometry_msgs.msg import Point
 from robot_vision_lectures.msg import XYZarray
 from robot_vision_lectures.msg import SphereParams
 
