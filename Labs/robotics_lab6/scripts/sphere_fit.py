@@ -54,22 +54,6 @@ def call_back(data):
 	# Get x,y,z co-ordinates of the 3D camera co-ordinate frame
 	# and append it to the current_sphere_params list
 	current_sphere_params = [(point.x, point.y, point.z) for point in data.points]
-
-
-def get_radius(P):
-	'''
-		Function to receive the calculated unknown matrix P for use in extracting the
-		sphere's centre 3D co-ordinates and its radius
-	'''
-	
-	# Extract the centre points and 4th element of P
-	xc, yc, zc, r_param = P[0]
-	
-	# Get radius
-	radius = math.sqrt(r_param + (xc**2) + (yc**2) + (zc**2))
-	
-	# Return the radius
-	return radius
 	
 	
 def fit_sphere(points):
@@ -112,10 +96,58 @@ def fit_sphere(points):
 	return P
 	
 	
-def low_pass_filter():
+def low_pass_filter(current_params, prev_params, sample_period):
 	'''
-		Function that takes the un
+		Function that takes the current & previous derived unknown matrices P; and 
+		sample period (dt) for use in implementing a low pass filter.
+		The low pass filter will be used to minimize noise 
+		from xc, yc, zc and a 4th parameter that is used to calculate the 
+		radius of the mathematical sphere model
 	'''
+	
+	# Define the filter gain
+	# NB:The cut-off frequency should be in the range 1 - 10
+	fil_gain = 0.05 * sample_period
+	
+	# Declare an empty list and counter
+	fil_out_cords = []
+	count = 0
+	
+	# Loop to filter the elements in current_params
+	for cord in current_params:
+		# Define current filter input
+		fil_in = cord[0]
+		
+		# Define next filter output
+		fil_out = (fil_gain*fil_in) + ((1 - fil_gain) * (prev_params[count]))
+		
+		# Append next filter output to list
+		fil_out_cords.append(fil_out)
+		
+		# Increment counter
+		count += 1
+	
+	# Return the filtered sphere parameters	
+	return fil_out_cords
+		
+
+def get_radius(fil_out_cords):
+	'''
+		Function to receive the filtered unknown matrix P co-ordinates
+		for use in extracting the
+		sphere's radius
+	'''
+	xc = float(fil_out_cords[0])
+	yc = float(fil_out_cords[1])
+	zc = float(fil_out_cords[2])
+	r_param = float(fil_out_cords[3])
+	
+	# Get radius
+	radius = math.sqrt(r_param + (xc**2) + (yc**2) + (zc**2))
+	
+	# Return the radius
+	return radius		
+		 
 	
 '''
 ===================================================================
@@ -140,6 +172,14 @@ if __name__ == '__main__':
 	# Set the loop frequency
 	rate = rospy.Rate(10)
 	
+	# Set the sample period derived from loop frequency above
+	dt = 1/10
+	
+	# Initiate previous model sphere parameters
+	# ......i.e xc, yc, zc and radius_constant
+	# Estimated from previous lab 5's unfiltered data
+	prev_params = [0.0137, 0.017, 0.4755, 0.0505]
+	
 	# Loop to continuosly get the unknown sphere model parameters
 	# and publish them to the respective topic in order to project
 	# the mathematical sphere mode on to the whitepoint
@@ -148,24 +188,32 @@ if __name__ == '__main__':
 		# Check point to ensure data is received
 		if msg_received:
 			
-			# Get the unknown but estimated matrix P
-			P = fit_sphere(current_sphere_params)
+			# Get the unknown but estimated matrix P....
+			# encompassing the mathematical sphere parameters
+			P = fit_sphere(current_sphere_params)			
 			
-			# Extract the co-ordiantes of the sphere's centre from the 
-			# 1st element of the unkown but estimated matrix P
-			xc, yc, zc, r_param = P[0]
+			# Call the low pass filter function passing the estimated 
+			# sphere co-ordinates for noise reduction
+			fil_out_cords = low_pass_filter(tuple(P[0]), prev_params, dt)
 			
-			# Get the estimated radius of the mathematical sphere model
-			radius = get_radius(P)
+			# Print function to keep track of xc, yc, zc & radius_parameter
+			print(fil_out_cords)
 			
-			# Assign the extracted xc, yc, zc and radius to a Sphere_Params msg
-			sphere_model.xc = float(xc)
-			sphere_model.yc = float(yc)
-			sphere_model.zc = float(zc)
+			# Get the estimated & filtered radius of the mathematical sphere model
+			radius = get_radius(fil_out_cords)
+			
+			# Assign the extracted & filtered xc, yc, zc and radius to a Sphere_Params msg
+			sphere_model.xc = float(fil_out_cords[0])
+			sphere_model.yc = float(fil_out_cords[1])
+			sphere_model.zc = float(fil_out_cords[2])
 			sphere_model.radius = radius
 			
 			# Publish the derived values to sphere_params topic
 			sphere_centre_pub.publish(sphere_model)
+			
+			# Make the current sphere parameters to a previous place holder
+			# for the next cycle
+			prev_params = tuple(fil_out_cords)
 			
 		# Pause till the next iteration
 		rate.sleep()
