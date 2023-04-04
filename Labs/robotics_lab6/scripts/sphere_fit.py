@@ -96,7 +96,7 @@ def fit_sphere(points):
 	return P
 	
 	
-def low_pass_filter(current_params, prev_params, sample_period):
+def low_pass_filter(current_params, prev_params):
 	'''
 		Function that takes the current & previous derived unknown matrices P; and 
 		sample period (dt) for use in implementing a low pass filter.
@@ -106,8 +106,8 @@ def low_pass_filter(current_params, prev_params, sample_period):
 	'''
 	
 	# Define the filter gain
-	# NB:The cut-off frequency should be in the range 1 - 10
-	fil_gain = 0.05 * sample_period
+	# NB: filter_gain = cut_off_frequency * sampling_period
+	fil_gain = 0.001
 	
 	# Declare an empty list and counter
 	fil_out_cords = []
@@ -171,14 +171,11 @@ if __name__ == '__main__':
 	
 	# Set the loop frequency
 	rate = rospy.Rate(10)
-	
-	# Set the sample period derived from loop frequency above
-	dt = 1/10
-	
+		
 	# Initiate previous model sphere parameters
 	# ......i.e xc, yc, zc and radius_constant
 	# Estimated from previous lab 5's unfiltered data
-	prev_params = [0.0137, 0.017, 0.4755, 0.0505]
+	prev_params = [-0.0137, -0.017, 0.478, -0.225]
 	
 	# Loop to continuosly get the unknown sphere model parameters
 	# and publish them to the respective topic in order to project
@@ -194,10 +191,10 @@ if __name__ == '__main__':
 			
 			# Call the low pass filter function passing the estimated 
 			# sphere co-ordinates for noise reduction
-			fil_out_cords = low_pass_filter(tuple(P[0]), prev_params, dt)
+			fil_out_cords = low_pass_filter(tuple(P[0]), prev_params)
 			
 			# Print function to keep track of xc, yc, zc & radius_parameter
-			print(fil_out_cords)
+			print('Current filter output: ',fil_out_cords)
 			
 			# Get the estimated & filtered radius of the mathematical sphere model
 			radius = get_radius(fil_out_cords)
