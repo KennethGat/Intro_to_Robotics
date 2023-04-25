@@ -32,7 +32,8 @@ if __name__ == '__main__':
 	# set a 10Hz frequency for this loop
 	loop_rate = rospy.Rate(10)
 
-	q_rot = Quaternion()	
+	q_rot = Quaternion()
+		
 	while not rospy.is_shutdown():
 
 		# Get the most recent updated transform info between
