@@ -101,14 +101,8 @@ if __name__ == '__main__':
 		# (published from the static frame broadcasters):
 		try:
 		
-			# (a) the camera as compared to the checkerboard
-			trans_cam_chckbrd = tfBuffer.lookup_transform("checkerboard", "camera_color_optical_frame", rospy.Time())
-			
-			# (b) the checkerboard as compared to the robot base frame
-			trans_chckbrd_rbase = tfBuffer.lookup_transform("base", "checkerboard", rospy.Time())
-			
-			# (c) the robot tool tip as compared to the robot base frame
-			trans_rtip_rbase = tfbuffer.lookup_transform("base", "fk_tooltip", rospy.Time())
+			# (a) the camera as compared to the robot base
+			trans_cam_chckbrd = tfBuffer.lookup_transform("base", "camera_color_optical_frame", rospy.Time())
 			
 		except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException):
 			print('One or more frames not available!!!')
@@ -125,15 +119,21 @@ if __name__ == '__main__':
 		pt_in_camera.z = z_c
 		
 		
-		# Get the transform of the sphere camera fit in relation to the checker board
-		pt_in_chckbrd_ball = tfBuffer.transform(pt_in_camera,'checkerboard',rospy.Duration(1.0))
+		# Get the transform of the sphere camera fit in relation to the robot base frame board
+		pt_in_base_ball = tfbuffer.lookup_transform ('base', pt_in_camera, rospy.Time())
 		
-		# Use the transform pt_in_chckbrd_ball to find out where the ball
-		# is with respect to the robot
-		pt_in_base_ball = tfbuffer.transform(pt_in_chckbrd_ball,'base', rospy.Duration(1.0))
+		# extract the xyz coordinates
+		x = pt_in_base_ball.transform.translation.x
+		y = pt_in_base_ball.transform.translation.y
+		z = pt_in_base_ball.transform.translation.z
+		# extract the quaternion and convert to Roll, Pitch and Yaw
+		q_rot = pt_in_base_ball.transform.rotation
+		roll, pitch, yaw, = euler_from_quaternion([q_rot.x, q_rot.y, q_rot.z, q_rot.w])
+		
 		
 		# Print the results of the sphere fit params with respect to the robot base frame
-		print('Transformed sphere fit in the BASE frame:  x= ', format(pt_in_base_ball.point.x, '.3f'), '(m), y= ', format(pt_in_base_ball.point.y, '.3f'), '(m), z= ', format(pt_in_base_ball.point.z, '.3f'),'(m)')
+		print('Ball camera frame position and orientation w.r.t base: x= ', format(x, '.3f'), '(m),  y= ', format(y, '.3f'), '(m), z= ', format(z, '.3f'),'(m)')
+		print('roll= ', format(roll, '.2f'), '(rad), pitch= ', format(pitch, '.2f'), '(rad), yaw: ', format(yaw, '.2f'),'(rad)') 
 		print('-------------------------------------------------')
 		
 		
