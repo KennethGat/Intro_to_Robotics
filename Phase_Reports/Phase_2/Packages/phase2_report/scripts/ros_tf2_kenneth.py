@@ -74,12 +74,15 @@ def call_back(data):
 	
 	# Error checking to ensure the sphere point cloud parameters are passed only when the crop fit has stabilized
 		
-	while abs(((xCentre_cur - xCentre_prev)/xCentre_prev)*100) > 0.1:
-		xCentre_prev = xCentre_cur
-		xCentre_cur = data.xc
-		yCentre_cur = data.yc
-		zCentre_cur = data.zc
-		radius_cur = data.radius
+	while abs(((xCentre_cur - xCentre_prev)/xCentre_prev)*100) > 0.01 or \
+		abs(((yCentre_cur - yCentre_prev)/yCentre_prev)*100) > 0.01 or \
+		abs(((zCentre_cur - zCentre_prev)/zCentre_prev)*100) > 0.01 or \
+		abs(((radius_cur - radius_prev)/radius_prev)*100) > 0.01:
+		
+		xCentre_prev, xCentre_cur = xCentre_cur, data.xc
+		yCentre_prev, yCentre_cur = yCentre_cur, data.yc
+		zCentre_prev, zCentre_cur = zCentre_cur, data.zc
+		radius_prev, radius_cur = radius_cur, data.radius
 
 '''
 ===================================================================
@@ -93,6 +96,10 @@ if __name__ == '__main__':
 	# add a subscriber to the /sphere_params topic to ......
 	# get the estimated tennis ball parameters for use in frame calculations
 	rospy.Subscriber('/sphere_params', SphereParams, call_back)
+	
+	# Prompt to ensure the sphere point cloud has stalibilized
+	print ("\nSphere cloud point stabilized!!!")
+	print ("================================\n")
 	
 	# add a ros transform listener
 	tfBuffer = tf2_ros.Buffer()
@@ -146,8 +153,6 @@ if __name__ == '__main__':
 		
 		print('Transformed ball camera point in the BASE frame:  x= ', format(pt_in_base.point.x, '.3f'), '(m), y= ', format(pt_in_base.point.y, '.3f'), '(m), z= ', format(pt_in_base.point.z, '.3f'),'(m)')
 		
-		
-		print(pt_in_base)
 		
 		# Pause till the next iteration
 		loop_rate.sleep()
