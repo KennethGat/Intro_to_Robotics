@@ -32,10 +32,10 @@ from robot_vision_lectures.msg import SphereParams
 ===================================================================
 '''
 msg_received = False
-x_c = float()
-y_c = float()
-z_c = float()
-radius = float()
+xCentre_cur = float()
+yCentre_cur = float()
+zCentre_cur = float()
+radius_cur = float()
 
 '''
 ===================================================================
@@ -50,20 +50,36 @@ def call_back(data):
 	'''
 	
 	global msg_received
-	global x_c
-	global y_c
-	global z_c
-	global radius
+	global xCentre_cur
+	global yCentre_cur
+	global zCentre_cur
+	global radius_cur
+	
+	# Initiate sphere fit previous_params for use in error checking
+	# Give arbitrary values to avoid divbyZero error
+	xCentre_prev = 0.1
+	yCentre_prev = 0.1
+	zCentre_prev = 0.1
+	radius_prev = 0.1
+	
+	# Get x,y,z co-ordinates of the 3D camera co-ordinate frame
+	# and append it to the current_sphere_params list
+	xCentre_cur = data.xc
+	yCentre_cur = data.yc
+	zCentre_cur = data.zc
+	radius_cur = data.radius
 	
 	# Checker to ensure data is recieved
 	msg_received = True
 	
-	# Get x,y,z co-ordinates of the 3D camera co-ordinate frame
-	# and append it to the current_sphere_params list
-	x_c = data.xc
-	y_c = data.yc
-	z_c = data.zc
-	radius = data.radius
+	# Error checking to ensure the sphere point cloud parameters are passed only when the crop fit has stabilized
+		
+	while abs(((xCentre_cur - xCentre_prev)/xCentre_prev)*100) > 0.1:
+		xCentre_prev = xCentre_cur
+		xCentre_cur = data.xc
+		yCentre_cur = data.yc
+		zCentre_cur = data.zc
+		radius_cur = data.radius
 
 '''
 ===================================================================
@@ -72,11 +88,11 @@ def call_back(data):
 '''
 if __name__ == '__main__':
 	# initialize the node
-	rospy.init_node('ros_tf_kenneth', anonymous = True)
+	rospy.init_node('ros_tf2_kenneth', anonymous = True)
 	
 	# add a subscriber to the /sphere_params topic to ......
 	# get the estimated tennis ball parameters for use in frame calculations
-	rospy.Subscriber("/sphere_params", SphereParams, call_back)
+	rospy.Subscriber('/sphere_params', SphereParams, call_back)
 	
 	# add a ros transform listener
 	tfBuffer = tf2_ros.Buffer()
@@ -88,39 +104,26 @@ if __name__ == '__main__':
 	# define a quaternion msg
 	q_rot = Quaternion()
 	
-	# Initiate sphere fit old_params for use in error checking
-	'''x_c_old = 0.0
-	y_c_old = 0.0
-	z_c_old = 0.0
-	radius_old = 0.0'''
 	
 	while not rospy.is_shutdown():
-
-		# Get the most recent updated transform info between
-		# (This is also used as a safety check to ensure there are frames being
-		# (published from the static frame broadcasters):
-		try:
 		
-			# (a) the camera as compared to the robot base
-			trans_cam_chckbrd = tfBuffer.lookup_transform("base", "camera_color_optical_frame", rospy.Time())
+		# Define the mathematically derived sphere fit centre parameters as points in the camera frame
+		pt_in_camera = tf2_geometry_msgs.PointStamped()
+		pt_in_camera.header.frame_id = 'camera_color_optical_frame'
+		pt_in_camera.header.stamp = rospy.get_rostime()
+		pt_in_camera.x = xCentre_cur
+		pt_in_camera.y = yCentre_cur
+		pt_in_camera.z = zCentre_cur
+		
+		# Get the transform of the sphere camera fit in relation to the robot base frame board
+		try:			
+			pt_in_base_ball = tfbuffer.lookup_transform ('base', pt_in_camera, rospy.Time())		
 			
 		except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException):
 			print('One or more frames not available!!!')
 			loop_rate.sleep()
 			continue
 			
-					
-		# Define the mathematically derived sphere fit centre parameters as points in the camera frame
-		pt_in_camera = tf2_geometry_msgs.PointStamped()
-		pt_in_camera.header.frame_id = 'camera_color_optical_frame'
-		pt_in_camera.header.stamp = rospy.get_rostime()
-		pt_in_camera.x = x_c
-		pt_in_camera.y = y_c
-		pt_in_camera.z = z_c
-		
-		
-		# Get the transform of the sphere camera fit in relation to the robot base frame board
-		pt_in_base_ball = tfbuffer.lookup_transform ('base', pt_in_camera, rospy.Time())
 		
 		# extract the xyz coordinates
 		x = pt_in_base_ball.transform.translation.x
