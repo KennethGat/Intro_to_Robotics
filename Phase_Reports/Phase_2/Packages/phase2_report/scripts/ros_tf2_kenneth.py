@@ -107,38 +107,47 @@ if __name__ == '__main__':
 	
 	while not rospy.is_shutdown():
 		
-		# Define the mathematically derived sphere fit centre parameters as points in the camera frame
-		pt_in_camera = tf2_geometry_msgs.PointStamped()
-		pt_in_camera.header.frame_id = 'camera_color_optical_frame'
-		pt_in_camera.header.stamp = rospy.get_rostime()
-		pt_in_camera.x = xCentre_cur
-		pt_in_camera.y = yCentre_cur
-		pt_in_camera.z = zCentre_cur
-		
 		# Get the transform of the sphere camera fit in relation to the robot base frame board
 		try:			
-			pt_in_base_ball = tfbuffer.lookup_transform ('base', pt_in_camera, rospy.Time())		
+			trans_base_camera = tfBuffer.lookup_transform ('base', 'camera_color_optical_frame', rospy.Time())		
 			
 		except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException):
 			print('One or more frames not available!!!')
 			loop_rate.sleep()
 			continue
 			
-		
 		# extract the xyz coordinates
-		x = pt_in_base_ball.transform.translation.x
-		y = pt_in_base_ball.transform.translation.y
-		z = pt_in_base_ball.transform.translation.z
+		x = trans_base_camera.transform.translation.x
+		y = trans_base_camera.transform.translation.y
+		z = trans_base_camera.transform.translation.z
 		# extract the quaternion and convert to Roll, Pitch and Yaw
-		q_rot = pt_in_base_ball.transform.rotation
+		q_rot = trans_base_camera.transform.rotation
 		roll, pitch, yaw, = euler_from_quaternion([q_rot.x, q_rot.y, q_rot.z, q_rot.w])
 		
 		
-		# Print the results of the sphere fit params with respect to the robot base frame
-		print('Ball camera frame position and orientation w.r.t base: x= ', format(x, '.3f'), '(m),  y= ', format(y, '.3f'), '(m), z= ', format(z, '.3f'),'(m)')
+		# Print the results of the camera frame with respect to the robot base frame
+		'''
+		print('Camera frame position and orientation w.r.t Base: x= ', format(x, '.3f'), '(m),  y= ', format(y, '.3f'), '(m), z= ', format(z, '.3f'),'(m)')
 		print('roll= ', format(roll, '.2f'), '(rad), pitch= ', format(pitch, '.2f'), '(rad), yaw: ', format(yaw, '.2f'),'(rad)') 
 		print('-------------------------------------------------')
+		'''
+				
+		# Define the mathematically derived sphere fit centre parameters as points in the camera frame
+		pt_in_camera = tf2_geometry_msgs.PointStamped()
+		pt_in_camera.header.frame_id = 'camera_color_optical_frame'
+		pt_in_camera.header.stamp = rospy.get_rostime()
+		pt_in_camera.point.x = xCentre_cur
+		pt_in_camera.point.y = yCentre_cur
+		pt_in_camera.point.z = zCentre_cur
 		
+		# Get the tranformation of the ball camera frame with respect to the robot base frame
+		pt_in_base = tfBuffer.transform(pt_in_camera,'base',rospy.Duration(1.0))
+		
+		
+		print('Transformed ball camera point in the BASE frame:  x= ', format(pt_in_base.point.x, '.3f'), '(m), y= ', format(pt_in_base.point.y, '.3f'), '(m), z= ', format(pt_in_base.point.z, '.3f'),'(m)')
+		
+		
+		print(pt_in_base)
 		
 		# Pause till the next iteration
 		loop_rate.sleep()
