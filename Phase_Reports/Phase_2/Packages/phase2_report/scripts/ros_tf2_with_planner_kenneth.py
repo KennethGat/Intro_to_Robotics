@@ -181,7 +181,7 @@ if __name__ == '__main__':
 		# derived sphere fit frame w.r.t. ur5e base frame
 		plan_point2.linear.x = pt_in_base.point.x
 		plan_point2.linear.y = pt_in_base.point.y
-		plan_point2.linear.z = pt_in_base.point.z + 0.33690127
+		plan_point2.linear.z = pt_in_base.point.z + 0.17 #Adjustment for flanger
 		plan_point2.angular.x = -3.0506
 		plan_point2.angular.y = -0.059
 		plan_point2.angular.z = 2.806

@@ -21,24 +21,24 @@ if __name__ == '__main__':
 
 	
 	plan_point1 = Twist()
-	# define a point near initialization position
-	plan_point1.linear.x = -0.6753
-	plan_point1.linear.y = -0.1276
-	plan_point1.linear.z = 0.3825
-	plan_point1.angular.x = -2.9506
-	plan_point1.angular.y = -0.0581
-	plan_point1.angular.z = 1.5598
+	# define a point near pickup position
+	plan_point1.linear.x = -0.01459
+	plan_point1.linear.y = -0.4771
+	plan_point1.linear.z = 0.58211
+	plan_point1.angular.x = -2.58878
+	plan_point1.angular.y = -0.0504
+	plan_point1.angular.z = 2.80972
 	# add this point to the plan
 	plan.points.append(plan_point1)
 	
 	plan_point2 = Twist()
 	# define a point for the pickup position
-	plan_point2.linear.x = -0.6755
-	plan_point2.linear.y = -0.1276
-	plan_point2.linear.z = 0.2989
-	plan_point2.angular.x = -3.076
+	plan_point2.linear.x = -0.022591
+	plan_point2.linear.y = -0.463483
+	plan_point2.linear.z = 0.0192461 + 0.33690127
+	plan_point2.angular.x = -3.0506
 	plan_point2.angular.y = -0.059
-	plan_point2.angular.z = 1.567
+	plan_point2.angular.z = 2.806
 	# add this point to the plan
 	plan.points.append(plan_point2)
 	
@@ -69,12 +69,12 @@ if __name__ == '__main__':
 	plan_point5 = Twist()
 	# Back to the safe initial position as defined in the
 	# manual_initialization module
-	plan_point5.linear.x = -0.626
-	plan_point5.linear.y = -0.127
-	plan_point5.linear.z = 0.495
-	plan_point5.angular.x = -2.762
-	plan_point5.angular.y = -0.05499
-	plan_point5.angular.z = 1.549
+	plan_point5.linear.x = -0.234489
+	plan_point5.linear.y = -0.32785
+	plan_point5.linear.z = 0.68358
+	plan_point5.angular.x = -2.3874
+	plan_point5.angular.y = -0.04317
+	plan_point5.angular.z = 2.1586
 	# add this point to the plan
 	plan.points.append(plan_point5)
 

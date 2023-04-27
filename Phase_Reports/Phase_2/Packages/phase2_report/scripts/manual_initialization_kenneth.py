@@ -35,9 +35,11 @@ if __name__ == '__main__':
 	pos_cmd_point.time_from_start = rospy.Duration(1.0) # here one second 
 	
 	# change the value of the shoulder_lift_joint to mimic the report's requirement
-	pos_cmd_point.positions[1] = -1.32
+	pos_cmd_point.positions[1] = -1.88
 	# change the value of the elbow_joint to mimic the report's requirement
-	pos_cmd_point.positions[0] = 1.38
+	pos_cmd_point.positions[0] = 1.57
+	# change the value of the shoulder_pan_joint to mimic the report's requirement
+	pos_cmd_point.positions[2] = 0.63
 	# change the value of the wrist_1_joint to mimic the report's requirement
 	pos_cmd_point.positions[3] = -2.01
 	# change the value of the wrist_2_joint to mimic the report's requirement
