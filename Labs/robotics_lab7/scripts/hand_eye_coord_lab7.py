@@ -186,43 +186,61 @@ if __name__ == '__main__':
 			plan = Plan()
 			
 			# Implement the planner
+
+			# define a point near pickup position			
 			plan_point1 = Twist()
 			point_mode1 = UInt8()
-			# define a point near pickup position
-			plan_point1.linear.x = tool_pose.linear.x
-			plan_point1.linear.y = tool_pose.linear.y
-			plan_point1.linear.z = tool_pose.linear.z
-			plan_point1.angular.x = tool_pose.angular.x
-			plan_point1.angular.y = tool_pose.angular.y
-			plan_point1.angular.z = tool_pose.angular.z
+
+			plan_point1.linear.x = -0.01976
+			plan_point1.linear.y = -0.390562
+			plan_point1.linear.z = 0.5551
+			plan_point1.angular.x = 3.14081
+			plan_point1.angular.y = 0.06212
+			plan_point1.angular.z = 0.31412
 			point_mode1.data = 0
 			# add this point to the plan
 			plan.points.append(plan_point1)
 			plan.modes.append(point_mode1)
-			
-			# point here above ball
 
-			plan_point2 = Twist()
-			point_mode2 = UInt8()
-			# define a point for the pickup position
+
+			# define a point for the pickup position with GRIPPER OPEN
 			# x, y & z co-ordinates referenced from the 
 			# derived sphere fit frame w.r.t. ur5e base frame
+			plan_point2 = Twist()
+			point_mode2 = UInt8()
+			
 			plan_point2.linear.x = pt_in_base.point.x
 			plan_point2.linear.y = pt_in_base.point.y
 			plan_point2.linear.z = pt_in_base.point.z + 0.17 #Adjustment for flanger
-			plan_point2.angular.x = tool_pose.angular.x
-			plan_point2.angular.y = tool_pose.angular.y
-			plan_point2.angular.z = tool_pose.angular.z
+			plan_point2.angular.x = 3.13381
+			plan_point2.angular.y = 0.06079
+			plan_point2.angular.z = 0.27032
 			point_mode2.data = 0
 			# add this point to the plan
 			plan.points.append(plan_point2)
 			plan.modes.append(point_mode2)
 
-			# point here closing gripper 
-
+			
+			# define a point for the pickup position with GRIPPER CLOSED
+			# x, y & z co-ordinates referenced from the 
+			# derived sphere fit frame w.r.t. ur5e base frame
+			plan_point2_1 = Twist()
+			point_mode2_1 = UInt8()
+			plan_point2_1.linear.x = pt_in_base.point.x
+			plan_point2_1.linear.y = pt_in_base.point.y
+			plan_point2_1.linear.z = pt_in_base.point.z + 0.17 #Adjustment for flanger
+			plan_point2_1.angular.x = 3.13381
+			plan_point2_1.angular.y = 0.06079
+			plan_point2_1.angular.z = 0.27032
+			point_mode2_1.data = 2
+			# add this point to the plan
+			plan.points.append(plan_point2_1)
+			plan.modes.append(point_mode2_1)
+			
+			
+			# define a point for a safe position above 'place' point 
 			plan_point3 = Twist()
 			point_mode3 = UInt8()
-			# define a point for a safe position above 'place' point 
 			plan_point3.linear.x = 0.5438
 			plan_point3.linear.y = -0.3359
 			plan_point3.linear.z = 0.4952
