@@ -22,12 +22,12 @@ if __name__ == '__main__':
 	
 	plan_point1 = Twist()
 	# define a point near pickup position
-	plan_point1.linear.x = -0.01976
-	plan_point1.linear.y = -0.390562
-	plan_point1.linear.z = 0.5551
-	plan_point1.angular.x = 3.14081
-	plan_point1.angular.y = 0.06212
-	plan_point1.angular.z = 0.31412
+	plan_point1.linear.x = -0.022072
+	plan_point1.linear.y = -0.383
+	plan_point1.linear.z = 0.39035
+	plan_point1.angular.x = 3.02043
+	plan_point1.angular.y = 0.3132
+	plan_point1.angular.z = 1.5132
 	# add this point to the plan
 	plan.points.append(plan_point1)
 	
@@ -64,6 +64,18 @@ if __name__ == '__main__':
 	plan_point4.angular.z = -0.609966
 	# add this point to the plan
 	plan.points.append(plan_point4)
+	
+	
+	plan_point5 = Twist()
+	# Back to initial position
+	plan_point5.linear.x = -0.022072
+	plan_point5.linear.y = -0.383
+	plan_point5.linear.z = 0.39035
+	plan_point5.angular.x = 3.02043
+	plan_point5.angular.y = 0.3132
+	plan_point5.angular.z = 1.5132
+	# add this point to the plan
+	plan.points.append(plan_point5)
 
 	
 	

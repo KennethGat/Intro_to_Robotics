@@ -41,8 +41,6 @@ xCentre_cur = float()
 yCentre_cur = float()
 zCentre_cur = float()
 radius_cur = float()
-tool_pose = Twist()
-pose_received = False
 
 '''
 ===================================================================
@@ -75,9 +73,7 @@ def call_back(data):
 	yCentre_cur = data.yc
 	zCentre_cur = data.zc
 	radius_cur = data.radius
-	
-	# Checker to ensure data is recieved
-	msg_received = True
+
 	
 	# Error checking to ensure the sphere point cloud parameters are passed only when the crop fit has stabilized
 		
@@ -90,21 +86,9 @@ def call_back(data):
 		yCentre_prev, yCentre_cur = yCentre_cur, data.yc
 		zCentre_prev, zCentre_cur = zCentre_cur, data.zc
 		radius_prev, radius_cur = radius_cur, data.radius
-		
-		
-def receive_tool_pose(data):
-	global tool_pose
-	global pose_received
 	
-	tool_pose.linear.x = data.linear.x
-	tool_pose.linear.y = data.linear.y
-	tool_pose.linear.z = data.linear.z
-	
-	tool_pose.angular.x = data.angular.x
-	tool_pose.angular.y = data.angular.y
-	tool_pose.angular.z = data.angular.z
-	
-	pose_received = True
+	# Checker to ensure data is recieved
+	msg_received = True	
 
 '''
 ===================================================================
@@ -121,13 +105,7 @@ if __name__ == '__main__':
 	# add a subscriber to the /sphere_params topic to ......
 	# get the estimated tennis ball parameters for use in frame calculations
 	rospy.Subscriber('/sphere_params', SphereParams, call_back)
-	
-	# Get tool pose
-	rospy.Subscriber('/ur5e/toolpose', Twist, receive_tool_pose)
-	
-	# Prompt to ensure the sphere point cloud has stalibilized
-	print ("\nSphere cloud point stabilized!!!")
-	print ("================================\n")
+
 	
 	# add a ros transform listener
 	tfBuffer = tf2_ros.Buffer()
@@ -141,9 +119,12 @@ if __name__ == '__main__':
 	
 	
 	while not rospy.is_shutdown():
-		if pose_received:
-			# print("Pose_Received")
-			# Get the transform of the sphere camera fit in relation to the robot base frame board
+		if msg_received:
+		
+			# Prompt to ensure the sphere point cloud has stalibilized
+			print ("\nSphere cloud point stabilized!!!")
+			print ("================================\n")
+
 			try:			
 				trans_base_camera = tfBuffer.lookup_transform ('base', 'camera_color_optical_frame', rospy.Time())		
 				
@@ -176,7 +157,7 @@ if __name__ == '__main__':
 			pt_in_camera.point.y = yCentre_cur
 			pt_in_camera.point.z = zCentre_cur
 			
-			# Get the tranformation of the ball camera frame with respect to the robot base frame
+			# Get the transformation of the ball camera frame with respect to the robot base frame
 			pt_in_base = tfBuffer.transform(pt_in_camera,'base',rospy.Duration(1.0))
 			
 			# Print the resultant ball camera frame with respect to the robot base frame
@@ -190,35 +171,34 @@ if __name__ == '__main__':
 			# define a point near pickup position			
 			plan_point1 = Twist()
 			point_mode1 = UInt8()
-
-			plan_point1.linear.x = -0.01976
-			plan_point1.linear.y = -0.390562
-			plan_point1.linear.z = 0.5551
-			plan_point1.angular.x = 3.14081
-			plan_point1.angular.y = 0.06212
-			plan_point1.angular.z = 0.31412
+			plan_point1.linear.x = -0.022072
+			plan_point1.linear.y = -0.383
+			plan_point1.linear.z = 0.39035
+			plan_point1.angular.x = 3.02043
+			plan_point1.angular.y = 0.3132
+			plan_point1.angular.z = 1.5132
 			point_mode1.data = 0
 			# add this point to the plan
 			plan.points.append(plan_point1)
 			plan.modes.append(point_mode1)
 
 
-			# define a point for the pickup position with GRIPPER OPEN
+			# define a point for the pickup position with GRIPPER IN...
+			# REGULAR MOTION MODE
 			# x, y & z co-ordinates referenced from the 
 			# derived sphere fit frame w.r.t. ur5e base frame
-			plan_point2 = Twist()
-			point_mode2 = UInt8()
-			
-			plan_point2.linear.x = pt_in_base.point.x
-			plan_point2.linear.y = pt_in_base.point.y
-			plan_point2.linear.z = pt_in_base.point.z + 0.17 #Adjustment for flanger
-			plan_point2.angular.x = 3.13381
-			plan_point2.angular.y = 0.06079
-			plan_point2.angular.z = 0.27032
-			point_mode2.data = 0
+			plan_point2_0 = Twist()
+			point_mode2_0 = UInt8()
+			plan_point2_0.linear.x = pt_in_base.point.x
+			plan_point2_0.linear.y = pt_in_base.point.y
+			plan_point2_0.linear.z = pt_in_base.point.z + 0.17 #Adjustment for flanger
+			plan_point2_0.angular.x = 3.13381
+			plan_point2_0.angular.y = 0.06079
+			plan_point2_0.angular.z = 0.27032
+			point_mode2_0.data = 0
 			# add this point to the plan
-			plan.points.append(plan_point2)
-			plan.modes.append(point_mode2)
+			plan.points.append(plan_point2_0)
+			plan.modes.append(point_mode2_0)
 
 			
 			# define a point for the pickup position with GRIPPER CLOSED
@@ -238,53 +218,106 @@ if __name__ == '__main__':
 			plan.modes.append(point_mode2_1)
 			
 			
+		
+			# define a point for the pickup position with GRIPPER back to...
+			# REGULAR MOTION MODE
+			# x, y & z co-ordinates referenced from the 
+			# derived sphere fit frame w.r.t. ur5e base frame
+			plan_point2_2 = Twist()
+			point_mode2_2 = UInt8()
+			plan_point2_2.linear.x = pt_in_base.point.x
+			plan_point2_2.linear.y = pt_in_base.point.y
+			plan_point2_2.linear.z = pt_in_base.point.z + 0.17 #Adjustment for flanger
+			plan_point2_2.angular.x = 3.13381
+			plan_point2_2.angular.y = 0.06079
+			plan_point2_2.angular.z = 0.27032
+			point_mode2_2.data = 0
+			# add this point to the plan
+			plan.points.append(plan_point2_2)
+			plan.modes.append(point_mode2_2)
+		
+			
 			# define a point for a safe position above 'place' point 
 			plan_point3 = Twist()
 			point_mode3 = UInt8()
-			plan_point3.linear.x = 0.5438
-			plan_point3.linear.y = -0.3359
-			plan_point3.linear.z = 0.4952
-			plan_point3.angular.x = tool_pose.angular.x
-			plan_point3.angular.y = tool_pose.angular.y
-			plan_point3.angular.z = tool_pose.angular.z
+			plan_point3.linear.x = -0.37053
+			plan_point3.linear.y = -0.2878
+			plan_point3.linear.z = 0.421558
+			plan_point3.angular.x = 2.5016
+			plan_point3.angular.y = 0.04878
+			plan_point3.angular.z = -0.64514
 			point_mode3.data = 0
 			# add this point to the plan
 			plan.points.append(plan_point3)
 			plan.modes.append(point_mode3)
 			
 			
-			plan_point4 = Twist()
-			point_mode4 = UInt8()
-			# Final 'place/drop' position definition
-			plan_point4.linear.x = 0.579
-			plan_point4.linear.y = -0.369
-			plan_point4.linear.z = 0.2989
-			plan_point4.angular.x = tool_pose.angular.x
-			plan_point4.angular.y = tool_pose.angular.y
-			plan_point4.angular.z = tool_pose.angular.z
-			point_mode4.data = 0
+			
+			# Final 'place/drop' position definition with gripper in...
+			# REGULAR MOTION MODE
+			plan_point4_0 = Twist()
+			point_mode4_0 = UInt8()
+			plan_point4_0.linear.x = -0.36131
+			plan_point4_0.linear.y = -0.2743
+			plan_point4_0.linear.z = 0.177717
+			plan_point4_0.angular.x = 3.12911
+			plan_point4_0.angular.y = 0.06079
+			plan_point4_0.angular.z = -0.609966
+			point_mode4_0.data = 0
 			# add this point to the plan
-			plan.points.append(plan_point4)
-			plan.modes.append(point_mode4)
+			plan.points.append(plan_point4_0)
+			plan.modes.append(point_mode4_0)
 
-			# point here to open gripper 
+			
+			# Final 'place/drop' position definition with gripper in...
+			# OPEN MODE
+			plan_point4_1 = Twist()
+			point_mode4_1 = UInt8()
+			plan_point4_1.linear.x = -0.36131
+			plan_point4_1.linear.y = -0.2743
+			plan_point4_1.linear.z = 0.177717
+			plan_point4_1.angular.x = 3.12911
+			plan_point4_1.angular.y = 0.06079
+			plan_point4_1.angular.z = -0.609966
+			point_mode4_1.data = 1
+			# add this point to the plan
+			plan.points.append(plan_point4_1)
+			plan.modes.append(point_mode4_1)
 			
 			
+			
+			# Final 'place/drop' position definition with gripper BACK TO...
+			# REGULAR MOTION MODE
+			plan_point4_2 = Twist()
+			point_mode4_2 = UInt8()
+			plan_point4_2.linear.x = -0.36131
+			plan_point4_2.linear.y = -0.2743
+			plan_point4_2.linear.z = 0.177717
+			plan_point4_2.angular.x = 3.12911
+			plan_point4_2.angular.y = 0.06079
+			plan_point4_2.angular.z = -0.609966
+			point_mode4_2.data = 0
+			# add this point to the plan
+			plan.points.append(plan_point4_2)
+			plan.modes.append(point_mode4_2) 
+	
+			
+			
+			# Back to initial position
 			plan_point5 = Twist()
 			point_mode5 = UInt8()
-			# Back to the safe initial position as defined in the
-			# manual_initialization module
-			plan_point5.linear.x = 0.234489
-			plan_point5.linear.y = -0.32785
-			plan_point5.linear.z = 0.68358
-			plan_point5.angular.x = tool_pose.angular.x
-			plan_point5.angular.y = tool_pose.angular.y
-			plan_point5.angular.z = tool_pose.angular.z
+			plan_point5.linear.x = -0.022072
+			plan_point5.linear.y = -0.383
+			plan_point5.linear.z = 0.39035
+			plan_point5.angular.x = 3.02043
+			plan_point5.angular.y = 0.3132
+			plan_point5.angular.z = 1.5132
 			point_mode5.data = 0
 			# add this point to the plan
 			plan.points.append(plan_point5)
 			plan.modes.append(point_mode5)
-			
+
+	
 			# publish the plan
 			plan_pub.publish(plan)		
 		
